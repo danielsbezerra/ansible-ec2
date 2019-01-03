@@ -1,0 +1,30 @@
+---
+- name: Create a new Demo EC2 instance
+  hosts: localhost
+  gather_facts: False
+
+  vars:
+      region: us-east-1
+      instance_type: t2.micro
+      ami: ami-f4cc1de2  # Ubuntu 16.04 LTS
+      ansible_ssh_private_key_file: "key.pem"
+  
+  tasks:
+
+    - name: Create an ec2 instance
+      ec2:
+         aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+         aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+         group: default  # security group name
+         instance_type: "{{ instance_type}}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         count: 1  # default
+         count_tag:
+            Name: Demo 2
+         instance_tags:
+            Name: Demo 2
+         vpc_subnet_id: subnet-d44c92fa
+         assign_public_ip: yes
+      register: ec2
